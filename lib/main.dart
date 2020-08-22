@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_ui_food_delivery/pages/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
  
 void main() => runApp(MyApp());
@@ -7,6 +8,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Material App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -14,13 +16,7 @@ class MyApp extends StatelessWidget {
           Theme.of(context).textTheme
         )
       ),
-      home: Scaffold(
-        body: Center(
-          child: Container(
-            child: Text('Hello World nice friday', style: TextStyle(fontSize: 25),),
-          ),
-        ),
-      ),
+      home: HomePage()
     );
   }
 }
