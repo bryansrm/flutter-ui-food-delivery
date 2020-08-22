@@ -6,6 +6,7 @@ import 'package:flutter_ui_food_delivery/core/constans.dart';
 import 'package:flutter_ui_food_delivery/core/flutter_icons.dart';
 import 'package:flutter_ui_food_delivery/models/food_model.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_ui_food_delivery/widgets/menu_clipper.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -13,97 +14,242 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   final foodList = FoodModel.list;
-  final pageController = PageController(viewportFraction: .6);
+  final pageController = PageController(viewportFraction: .7);
+  double paddingLeft = 0.0;
 
   @override
   Widget build(BuildContext context) {
+
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
+        child: Container(
+          width: size.width,
+          height: size.height,
+          child: Stack(
+            children: [
 
-            _customAppBar(),
+              Padding(
+                padding: EdgeInsets.only(left: 60.0),
+                child: _buildContent(),
+              ),
 
-            Expanded(
-              child: ListView(
-                physics: BouncingScrollPhysics(),
-                children: [
+              Container(
+                color: AppColors.greenColor,
+                height: size.height,
+                width: 60,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
 
-                  Container(
-                    height: 300,
-                    child: PageView.builder(
-                      controller: pageController,
-                      physics: BouncingScrollPhysics(),
-                      itemCount: foodList.length,
-                      itemBuilder: ( _, index ){
-                        return Padding(
-                          padding: EdgeInsets.only(right: 15),
-                          child: Stack(
-                            children: [
-
-                              _buildCardsFood(index),
-
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: Transform.rotate(
-                                  angle: pi / 3,
-                                  child: Image(
-                                    width: 170.0,
-                                    image: AssetImage('assets/images/${foodList[index].imgPath}'),
-                                  ),
-                                ),
-                              ),
-
-                              Positioned(
-                                bottom: 0,
-                                right: 25,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.redColor,
-                                    borderRadius: BorderRadius.circular(15.0)
-                                  ),
-                                  child: Text(
-                                    '\$${foodList[index].price.toInt()}',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15.0
-                                    ),
-                                  ),
-                                ),
-                              )
-
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  Padding(
-                    padding: EdgeInsets.only(left: 40),
-                    child: Text(
-                      'Popular',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold
+                    Container(
+                      width: 40.0,
+                      height: 40.0,
+                      margin: EdgeInsets.only(top: 15.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/profile.jpg')
+                        )
                       ),
                     ),
-                  ),
-                  
-                  SizedBox(height: 16,),
 
-                  _buildPopularList()
+                    Container(
+                      width: 40.0,
+                      height: 40.0,
+                      margin: EdgeInsets.only(bottom: 5.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          FlutterIcons.menu
+                        ),
+                      ),
+                    )
 
-                ],
+                  ],
+                ),
               ),
-            )
 
-          ],
+              Positioned(
+                bottom: 0,
+                left: 3,
+                child: Transform.rotate(
+                  angle:  - pi / 2,
+                  alignment: Alignment.topLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                      Row(
+                        children: [
+
+                          _buildMenu('Vegetables', 0),
+                          _buildMenu('Chicken', 1),
+                          _buildMenu('Beef', 2),
+                          _buildMenu('Thai', 3),
+
+                        ],
+                      ),
+
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 250),
+                        margin: EdgeInsets.only(left: paddingLeft),
+                        width: 120,
+                        child: Stack(
+                          children: [
+
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: ClipPath(
+                                clipper: MenuClipper(),
+                                child: Container(
+                                  width: 120,
+                                  height: 60,
+                                  color: AppColors.greenColor,
+                                ),
+                              ),
+                            ),
+
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: Transform.rotate(
+                                angle: pi / 2,
+                                child: Icon(
+                                  FlutterIcons.arrow,
+                                  size: 16,
+                                ),
+                              ),
+                            )
+
+                          ],
+                        ),
+                      )
+
+                    ],
+                  ),
+                ),
+              )
+
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Widget _buildMenu(String text, int index){
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          paddingLeft = 120.0 * index;
+        });
+      },
+      child: Container(
+        // color: Colors.red,
+        margin: EdgeInsets.only(right: 2.0),
+        width: 120,
+        height: 50,
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 20.0
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Column _buildContent() {
+    return Column(
+        children: [
+
+          _customAppBar(),
+
+          Expanded(
+            child: ListView(
+              physics: BouncingScrollPhysics(),
+              children: [
+
+                Container(
+                  height: 300,
+                  child: PageView.builder(
+                    controller: pageController,
+                    physics: BouncingScrollPhysics(),
+                    itemCount: foodList.length,
+                    itemBuilder: ( _, index ){
+                      return Padding(
+                        padding: EdgeInsets.only(right: 15),
+                        child: Stack(
+                          children: [
+
+                            _buildCardsFood(index),
+
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: Transform.rotate(
+                                angle: pi / 3,
+                                child: Image(
+                                  width: 170.0,
+                                  image: AssetImage('assets/images/${foodList[index].imgPath}'),
+                                ),
+                              ),
+                            ),
+
+                            Positioned(
+                              bottom: 0,
+                              right: 25,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
+                                decoration: BoxDecoration(
+                                  color: AppColors.redColor,
+                                  borderRadius: BorderRadius.circular(15.0)
+                                ),
+                                child: Text(
+                                  '\$${foodList[index].price.toInt()}',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15.0
+                                  ),
+                                ),
+                              ),
+                            )
+
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.only(left: 40, top: 10.0),
+                  child: Text(
+                    'Popular',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ),
+                
+                SizedBox(height: 16,),
+
+                _buildPopularList()
+
+              ],
+            ),
+          )
+
+        ],
+      );
   }
 
   Widget _buildCardsFood(int index) {
@@ -183,7 +329,7 @@ class _HomePageState extends State<HomePage> {
       itemCount: foodList.length,
       itemBuilder: ( _, index ){
         return Container(
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(12.0),
           height: 120.0,
           margin: EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
@@ -205,44 +351,47 @@ class _HomePageState extends State<HomePage> {
 
               SizedBox( width: 15,),
 
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
 
-                  Text(
-                    foodList[index].name,
-                    style: TextStyle(
-                      fontSize: 20
+                    Text(
+                      foodList[index].name,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 20
+                      ),
                     ),
-                  ),
 
-                  SizedBox( height: 5,),
+                    SizedBox( height: 5,),
 
-                  Row(
-                    children: [
+                    Row(
+                      children: [
 
-                      Text(
-                        '\$${foodList[index].price.toInt()}',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: AppColors.redColor,
-                          fontWeight: FontWeight.bold
+                        Text(
+                          '\$${foodList[index].price.toInt()}',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: AppColors.redColor,
+                            fontWeight: FontWeight.bold
+                          ),
                         ),
-                      ),
 
-                      SizedBox( width: 15,),
+                        SizedBox( width: 15,),
 
-                      Text(
-                        '${foodList[index].weight.toInt()} gm Weight',
-                        style: TextStyle(
-                          fontSize: 12
+                        Text(
+                          '${foodList[index].weight.toInt()} gm Weight',
+                          style: TextStyle(
+                            fontSize: 12
+                          ),
                         ),
-                      ),
 
-                    ],
-                  )
+                      ],
+                    )
 
-                ],
+                  ],
+                ),
               )
 
             ],
